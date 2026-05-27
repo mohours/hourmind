@@ -9,6 +9,7 @@ export const router = createRouter({
     { path: '/keys', name: 'keys', component: () => import('@/views/KeysView.vue') },
     { path: '/chat', name: 'chat', component: () => import('@/views/ChatView.vue') },
     { path: '/history', name: 'history', component: () => import('@/views/HistoryView.vue') }, // 历史记录页
+    { path: '/settings', name: 'settings', component: () => import('@/views/SettingsView.vue') }, // 系统设置页
     { path: '/', name: 'dashboard', component: () => import('@/views/DashboardView.vue') },
   ],
 })

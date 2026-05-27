@@ -5,8 +5,9 @@
     <nav class="nav">
       <router-link to="/" class="ni" exact-active-class="na"><span class="ni-icon">📊</span>仪表盘</router-link>
       <router-link to="/chat" class="ni" active-class="na"><span class="ni-icon">💬</span>智能对话</router-link>
-      <router-link to="/history" class="ni" active-class="na"><span class="ni-icon">📋</span>历史记录</router-link> <!-- 导航链接：历史记录页面 -->
       <router-link to="/keys" class="ni" active-class="na"><span class="ni-icon">🔑</span>API Key</router-link>
+      <router-link to="/history" class="ni" active-class="na"><span class="ni-icon">📋</span>历史记录</router-link>
+      <router-link to="/settings" class="ni" active-class="na"><span class="ni-icon">⚙️</span>系统设置</router-link>
     </nav>
     <div class="ft"><button class="lo" @click="a.logout()">退出登录</button></div>
   </aside>

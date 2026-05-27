@@ -335,17 +335,35 @@ registerRoute('history.batch_tag', async (payload): Promise<WsResponse> => {
       }
     }
 
-    // 批量创建标签关联，skipDuplicates 跳过已有标签
-    const result = await prisma.conversationTag.createMany({
-      data: rows,                    // 笛卡尔积数据
-      skipDuplicates: true,          // 跳过已存在的标签关联（@@unique 约束）
+    // 先查询已存在的标签关联，避免重复插入（SQLite 不支持 skipDuplicates）
+    const existingTags = await prisma.conversationTag.findMany({
+      where: {
+        conversationId: { in: conversation_ids }, // 这些会话的已有标签
+        tag: { in: cleanTags }, // 这些标签名
+      },
+      select: { conversationId: true, tag: true }, // 只取两个字段
     })
+    // 构建已有标签的 Set（"conversationId:tag" 做 key）
+    const existingSet = new Set(
+      existingTags.map(t => `${t.conversationId}:${t.tag}`)
+    )
+    // 过滤掉已存在的关联
+    const newRows = rows.filter(r => !existingSet.has(`${r.conversationId}:${r.tag}`))
+
+    // 如果有新关联才插入
+    let tagged = 0
+    if (newRows.length > 0) {
+      const result = await prisma.conversationTag.createMany({
+        data: newRows, // 只插入不存在的标签关联
+      })
+      tagged = result.count
+    }
 
     // 返回成功响应，包含打标签数量
     return {
       success: true,
       data: {
-        tagged: result.count  // 实际创建的关联条数
+        tagged, // 实际创建的关联条数
       }
     }
   } catch (e: any) {
