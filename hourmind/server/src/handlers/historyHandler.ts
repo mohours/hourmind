@@ -157,7 +157,7 @@ registerRoute('history.list', async (payload): Promise<WsResponse> => {
         conversations: formattedConversations,  // 对话列表
         total,                                   // 总条数
         page,                                    // 当前页码
-        safePageSize,                                // 每页条数
+        pageSize: safePageSize,                     // 每页条数
         totalPages,                              // 总页数
       }
     }
@@ -299,10 +299,38 @@ registerRoute('history.batch_tag', async (payload): Promise<WsResponse> => {
       }
     }
 
+    // 清洗标签：去空格、过滤空字符串和超长标签
+    const cleanTags = tags
+      .map((t: string) => t.trim())       // 去前后空格
+      .filter((t: string) => t.length > 0 && t.length <= 50)  // 过滤空字符串和超长标签
+
+    // 清洗后标签为空则报错
+    if (cleanTags.length === 0) {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_PARAMS',
+          message: '标签不能为空或超过50个字符'
+        }
+      }
+    }
+
+    // 限制笛卡尔积最大行数，防止超大数据量
+    const maxRows = 5000  // 最大 5000 条关联
+    if (conversation_ids.length * cleanTags.length > maxRows) {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_PARAMS',
+          message: `批量标签数量超过限制（最多 ${maxRows} 条关联）`
+        }
+      }
+    }
+
     // 构建批量插入的数据：笛卡尔积（每个对话 × 每个标签）
     const rows: { conversationId: string; tag: string }[] = []
     for (const conversationId of conversation_ids) {
-      for (const tag of tags) {
+      for (const tag of cleanTags) {
         rows.push({ conversationId, tag })
       }
     }
