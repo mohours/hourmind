@@ -43,13 +43,14 @@ registerRoute('history.list', async (payload): Promise<WsResponse> => {
       date_from,        // 日期范围开始
       date_to,          // 日期范围结束
       page = 1,         // 页码，默认第1页
+      pageSize = 30,    // 每页条数，默认30
       sort = 'updated_desc',  // 排序方式，默认按更新时间倒序
     } = payload || {}
 
-    // 每页条数固定为30
-    const pageSize = 30
+    // 每页条数，限制最大100防止滥用
+    const safePageSize = Math.min(pageSize, 100)  // 最大 100 条/页
     // 计算跳过条数：(页码-1) * 每页条数
-    const skip = (page - 1) * pageSize
+    const skip = (page - 1) * safePageSize
 
     // 构建 Prisma where 条件对象
     const where: any = {}
@@ -117,7 +118,7 @@ registerRoute('history.list', async (payload): Promise<WsResponse> => {
         where,           // 筛选条件
         orderBy,         // 排序
         skip,            // 跳过条数（分页）
-        take: pageSize,  // 取多少条
+        take: safePageSize,  // 取多少条
         include: {
           // 关联查询标签表，只取 tag 字段
           tags: {
@@ -147,7 +148,7 @@ registerRoute('history.list', async (payload): Promise<WsResponse> => {
     }))
 
     // 计算总页数（向上取整）
-    const totalPages = Math.ceil(total / pageSize)
+    const totalPages = Math.ceil(total / safePageSize)
 
     // 返回成功响应
     return {
@@ -156,7 +157,7 @@ registerRoute('history.list', async (payload): Promise<WsResponse> => {
         conversations: formattedConversations,  // 对话列表
         total,                                   // 总条数
         page,                                    // 当前页码
-        pageSize,                                // 每页条数
+        safePageSize,                                // 每页条数
         totalPages,                              // 总页数
       }
     }
@@ -306,24 +307,17 @@ registerRoute('history.batch_tag', async (payload): Promise<WsResponse> => {
       }
     }
 
-    // 批量创建标签关联
-    // 注意：SQLite 不支持 skipDuplicates，使用 try/catch 包裹单个创建来跳过重复
-    let createdCount = 0
-    for (const row of rows) {
-      try {
-        // 逐个创建，遇到重复（@@unique 约束冲突）会抛错，捕获后跳过
-        await prisma.conversationTag.create({ data: row })
-        createdCount++
-      } catch {
-        // 重复键错误，跳过这条
-      }
-    }
+    // 批量创建标签关联，skipDuplicates 跳过已有标签
+    const result = await prisma.conversationTag.createMany({
+      data: rows,                    // 笛卡尔积数据
+      skipDuplicates: true,          // 跳过已存在的标签关联（@@unique 约束）
+    })
 
     // 返回成功响应，包含打标签数量
     return {
       success: true,
       data: {
-        tagged: createdCount  // 实际创建的关联条数
+        tagged: result.count  // 实际创建的关联条数
       }
     }
   } catch (e: any) {
