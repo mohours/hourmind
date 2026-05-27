@@ -102,8 +102,10 @@ export async function summarizeChat(
     const summary = data.choices?.[0]?.message?.content || ''
     return summary.trim()
   } catch (e: any) {
-    // 超时或网络错误
+    // 超时或网络错误 → 区分超时和网络错误给出不同提示
     console.error('[summarizeChat] 异常:', e.message)
-    return '[错误] 摘要请求失败'
+    return e.name === 'TimeoutError'
+      ? '[错误] 摘要请求超时'        // 超时
+      : '[错误] 摘要请求失败'        // 网络错误
   }
 }
