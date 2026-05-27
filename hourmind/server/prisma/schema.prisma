@@ -1,0 +1,112 @@
+// 告诉 Prisma 生成 JavaScript 客户端代码
+generator client {
+  provider = "prisma-client-js"
+}
+
+// SQLite 文件型数据库，数据存到 prisma/db/hourmind.db 这个文件里
+datasource db {
+  provider = "sqlite"
+  url      = "file:./db/hourmind.db"
+}
+
+// 系统配置表（key-value 结构，一个 key 一行，存密码哈希等）
+model AppConfig {
+  key   String @id
+  value String
+}
+
+// AI 厂商（OpenAI、Claude、DeepSeek 等）
+model AiProvider {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  baseUrl   String
+  logoUrl   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  apiKeys   ApiKey[]
+}
+
+// 用户添加的 API Key
+model ApiKey {
+  id           String             @id @default(uuid())
+  providerId   String
+  provider     AiProvider         @relation(fields: [providerId], references: [id])
+  alias        String
+  encryptedKey String
+  keySuffix    String
+  tags         String             @default("[]")
+  status       String             @default("active")
+  isDeleted    Boolean            @default(false)
+  deletedAt    DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  testLogs     KeyTestLog[]
+  usageRecords TokenUsageRecord[]
+}
+
+// Key 测试记录
+model KeyTestLog {
+  id           String   @id @default(uuid())
+  keyId        String
+  key          ApiKey   @relation(fields: [keyId], references: [id])
+  isSuccess    Boolean
+  latencyMs    Int
+  errorMessage String?
+  testedAt     DateTime @default(now())
+}
+
+// Token 用量记录
+model TokenUsageRecord {
+  id                 String   @id @default(uuid())
+  keyId              String
+  key                ApiKey   @relation(fields: [keyId], references: [id])
+  modelName          String
+  promptTokens       Int
+  completionTokens   Int
+  estimatedCostCents Int      @default(0)
+  recordedAt         DateTime @default(now())
+  sessionId          String?
+}
+
+// 会话
+model Conversation {
+  id           String            @id @default(uuid())
+  title        String
+  model        String
+  status       String            @default("active")
+  isPinned     Boolean           @default(false)
+  isStarred    Boolean           @default(false)
+  totalTokens  Int               @default(0)
+  messageCount Int               @default(0)
+  summary      String?                               // AI 生成的会话摘要（200字以内）
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  messages     Message[]
+  tags         ConversationTag[]                      // 关联的标签
+}
+
+// 消息
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  role           String
+  content        String
+  model          String?
+  tokenCount     Int?
+  metadata       String       @default("{}")
+  createdAt      DateTime     @default(now())
+}
+
+// 会话标签关联表（多对多）
+model ConversationTag {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  tag            String                               // 标签名，如 "工作"、"学习"、"项目A"
+  createdAt      DateTime     @default(now())
+
+  @@unique([conversationId, tag])                     // 同一会话不能重复打同一个标签
+  @@index([tag])                                      // 按标签名查询时加索引
+}
