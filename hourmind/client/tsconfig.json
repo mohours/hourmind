@@ -1,10 +1,48 @@
 {
+  // ============================================================
+  // tsconfig.json —— 前端 TypeScript 编译器配置
+  //
+  // 和服务端 tsconfig.json 的主要区别：
+  //   1. module: "ESNext" —— 前端用 ES Module（import 语法）
+  //   2. jsx: "preserve" —— 保留 JSX 语法让 Vite 处理
+  //   3. paths: { "@/*": ["src/*"] } —— @ 别名指向 src/ 目录
+  //
+  // 什么是 @ 别名？
+  //   写代码时 import '@/stores/keyStore' 等价于 import './src/stores/keyStore'
+  //   好处：不管文件在哪个目录，@ 都指向 src/，不用写 ../../ 这种相对路径
+  //
+  // 为什么是双文件结构？
+  //   tsconfig.json        — 只编译 app 代码（src/ 下的 .ts 和 .vue）
+  //   tsconfig.node.json   — 只编译 vite.config.ts（Node.js 环境）
+  //   两者通过 references 关联，分开编译因为运行环境不同（浏览器 vs Node.js）
+  // ============================================================
   "compilerOptions": {
-    "target": "ES2022", "module": "ESNext", "moduleResolution": "bundler",
-    "strict": true, "jsx": "preserve", "esModuleInterop": true,
-    "skipLibCheck": true, "resolveJsonModule": true, "isolatedModules": true,
-    "baseUrl": ".", "paths": { "@/*": ["src/*"] }
+    // --- 编译目标 ---
+    "target": "ES2022",                // 编译成 ES2022 标准（现代浏览器都支持）
+    "module": "ESNext",                // ES Module 格式（import/export）
+    "moduleResolution": "bundler",     // 模块查找方式：按打包器（Vite）的方式解析
+
+    // --- 严格模式与类型 ---
+    "strict": true,                    // 开启所有严格类型检查
+    "jsx": "preserve",                 // 保留 JSX 不转换（让 Vite 的 Vue 插件处理）
+
+    // --- 兼容性与优化 ---
+    "esModuleInterop": true,           // 允许 import CommonJS 模块
+    "skipLibCheck": true,              // 跳过类型文件检查（加速编译）
+    "resolveJsonModule": true,         // 允许 import .json 文件
+    "isolatedModules": true,           // 每个文件当作独立模块（Vite/esbuild 要求）
+
+    // --- 路径别名 ---
+    "baseUrl": ".",                    // 路径解析基准目录（当前目录）
+    "paths": {
+      "@/*": ["src/*"]                 // @/ 别名 → src/ 目录
+    }
   },
+
+  // 编译范围：src/ 下所有 .ts 和 .vue 文件
   "include": ["src/**/*.ts", "src/**/*.vue"],
+
+  // references：关联另一个 tsconfig 文件
+  // tsconfig.node.json 负责编译 vite.config.ts（Node.js 环境）
   "references": [{ "path": "./tsconfig.node.json" }]
 }

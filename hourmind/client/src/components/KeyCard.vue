@@ -1,4 +1,8 @@
-<!-- KeyCard.vue —— 单张 Key 卡片 -->
+<!--
+  KeyCard.vue —— 单张 API Key 卡片组件
+  显示厂商名、别名、Key 后缀（后 6 位）、状态指示灯
+  操作按钮：测试连通性、启用/禁用、删除
+-->
 <template>
   <div class="glass-card kc">
     <div class="ki"><span class="kp">{{ ak.provider.name }}</span><span class="ka">{{ ak.alias }}</span><span class="text-muted" style="font-size:12px;font-family:monospace">...{{ ak.keySuffix }}</span></div>

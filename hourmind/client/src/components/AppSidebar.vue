@@ -1,4 +1,11 @@
-<!-- AppSidebar.vue —— 左侧导航栏 -->
+<!--
+  AppSidebar.vue —— 左侧导航栏（全局常驻组件）
+  已登录后始终显示，宽 260px 固定宽度，包含：
+    - HourMind Logo + "小时智脑"副标题
+    - 5 个导航链接：仪表盘 / 智能对话 / API Key / 历史记录 / 系统设置
+    - 底部退出登录按钮
+  router-link 用 exact-active-class 和 active-class 实现高亮当前页
+-->
 <template>
   <aside class="sb">
     <div class="logo"><h1>HourMind</h1><span class="sub">小时智脑</span></div>

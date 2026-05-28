@@ -1,4 +1,21 @@
 {
-  "compilerOptions": { "composite": true, "skipLibCheck": true, "module": "ESNext", "moduleResolution": "bundler", "allowSyntheticDefaultImports": true },
-  "include": ["vite.config.ts"]
+  // ============================================================
+  // tsconfig.node.json —— Vite 配置文件的 TypeScript 编译设置
+  //
+  // 为什么需要单独的 tsconfig？
+  //   vite.config.ts 运行在 Node.js 环境（不是浏览器），
+  //   和 app 代码的编译环境不同：
+  //     app 代码（浏览器）→ ESNext module
+  //     vite.config.ts（Node.js）→ ESNext module（但用 bundler 解析）
+  //
+  // composite: true 表示这个文件是被主 tsconfig.json 引用的子配置
+  // ============================================================
+  "compilerOptions": {
+    "composite": true,                    // 子项目标记（被主 tsconfig 的 references 引用必须开）
+    "skipLibCheck": true,                 // 跳过类型文件检查
+    "module": "ESNext",                   // ES Module 格式
+    "moduleResolution": "bundler",        // 按打包器方式解析模块路径
+    "allowSyntheticDefaultImports": true  // 允许 import 没有默认导出的模块（如 import vue from '@vitejs/plugin-vue'）
+  },
+  "include": ["vite.config.ts"]           // 只编译这一个文件
 }

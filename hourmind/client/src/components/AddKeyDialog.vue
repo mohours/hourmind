@@ -1,4 +1,8 @@
-<!-- AddKeyDialog.vue —— 添加 Key 弹窗 -->
+<!--
+  AddKeyDialog.vue —— 添加 API Key 弹窗
+  玻璃拟态模态框：选择 AI 厂商 → 粘贴 Key → 填别名 → 提交
+  提交后 Key 经 AES-256 加密存到后端，前端永远只拿到 keySuffix（后 6 位）
+-->
 <template>
   <div class="dm" @click.self="$emit('close')">
     <div class="glass-card db">
@@ -15,10 +19,13 @@
   </div>
 </template>
 <script setup lang="ts">
+
 import { ref } from 'vue'; import { useKeyStore } from '@/stores/keyStore'
+
 const emit = defineEmits<{ close:[]; created:[] }>()
 const ks = useKeyStore()
 const pid = ref(''); const kv = ref(''); const al = ref(''); const er = ref(''); const sb = ref(false)
+
 async function sub() {
   er.value = ''
   if (!pid.value) { er.value='请选择厂商'; return }
@@ -28,7 +35,9 @@ async function sub() {
   catch(e:any) { er.value=e.message||'添加失败' }
   finally { sb.value=false }
 }
+
 </script>
+
 <style scoped>
 .dm { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:1000 }
 .db { width:480px; padding:32px; display:flex; flex-direction:column; gap:12px }

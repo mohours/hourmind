@@ -41,17 +41,22 @@ registerRoute('conversations.list', async (): Promise<WsResponse> => {
 // 新建一个空会话（还没有消息）
 // payload: { title?, model? }
 registerRoute('conversations.create', async (payload): Promise<WsResponse> => {
-  const { title, model } = payload || {}
+  try {
+    const { title, model } = payload || {}
 
-  // 创建会话记录
-  const conv = await prisma.conversation.create({
-    data: {
-      title: title || '新对话',             // 标题默认"新对话"
-      model: model || 'deepseek-v4-pro',            // 模型默认 deepseek-v4-pro
-    },
-  })
+    // 创建会话记录
+    const conv = await prisma.conversation.create({
+      data: {
+        title: title || '新对话',             // 标题默认"新对话"
+        model: model || 'deepseek-v4-pro',            // 模型默认 deepseek-v4-pro
+      },
+    })
 
-  return { success: true, data: conv }
+    return { success: true, data: conv }
+  } catch (e: any) {
+    console.error('❌ conversations.create 失败:', e.message || e, e.stack?.slice(0, 300))
+    return { success: false, error: { code: 'INTERNAL_ERROR', message: e.message || '创建会话失败' } }
+  }
 })
 
 // ==================== conversations.delete ====================

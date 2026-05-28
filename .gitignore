@@ -1,29 +1,42 @@
-# 依赖
+# ============================================================
+# .gitignore —— Git 忽略规则
+# 告诉 Git 哪些文件/目录不要提交到仓库
+#
+# 为什么要忽略这些？
+#   1. node_modules/ 有几千个文件几百 MB，npm install 就能还原，不需要存
+#   2. .env 包含 JWT_SECRET、ENCRYPTION_KEY 等密钥，泄露了别人能伪造 Token
+#   3. dist/ 是从源码编译出来的，随时可重新编译
+#   4. .DS_Store 是 macOS 自动生成的文件夹信息，和项目无关
+# ============================================================
+
+# --- 依赖包（npm install 即可还原，体积巨大）---
 node_modules/
 
-# 环境变量（含密钥）
+# --- 环境变量文件（含 JWT_SECRET、ENCRYPTION_KEY 等密钥，绝对不能泄露）---
 .env
 .env.local
 .env.*.local
 
-# SQLite 数据库文件
+# --- SQLite 数据库文件（本地数据，不提交到仓库）---
 *.db
 *.db-journal
 
-# 编译输出
+# --- 编译输出（从 .ts 编译出的 .js，随时可重新编译）---
 dist/
 *.tsbuildinfo
 
-# IDE
+# --- IDE 编辑器配置（每个人编辑器配置不同，不共享）---
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# --- macOS 系统文件（Finder 自动生成的隐藏文件）---
 .DS_Store
 
-# 日志
+# --- 日志文件 ---
 *.log
 npm-debug.log*
 
-# 用户上传文件
+# --- 用户上传的文件目录 ---
 data/

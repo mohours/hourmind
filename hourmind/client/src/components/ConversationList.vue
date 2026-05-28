@@ -1,4 +1,8 @@
-<!-- ConversationList.vue —— 左侧会话列表 -->
+<!--
+  ConversationList.vue —— 左侧会话列表组件（ChatView 内使用）
+  顶部"+ 新对话"按钮 + 会话列表（标题 + 删除按钮）
+  选中会话高亮，点击加载消息历史
+-->
 <template>
   <div class="csb"><button class="btn-primary nb" @click="cs.createConversation()">+ 新对话</button>
     <div class="cl">

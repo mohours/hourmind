@@ -1,4 +1,9 @@
-<!-- SetupView.vue —— 首次设置密码 -->
+<!--
+  SetupView.vue —— 首次设置密码页面
+  用户首次打开 HourMind 时看到的第一个页面
+  输入两次密码 → 调 appStore.setup() → 后端存 bcrypt 哈希 → 跳转首页
+  特点：全屏居中玻璃卡片、无导航栏
+-->
 <template>
   <div class="auth-page">
     <div class="glass-card auth-card">

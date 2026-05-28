@@ -1,17 +1,42 @@
 {
+  // ============================================================
+  // tsconfig.json —— TypeScript 编译器配置
+  //
+  // 这个文件告诉 TypeScript 编译器（tsc）如何把 .ts 代码编译成 .js。
+  //
+  // 为什么要编译？
+  //   浏览器和 Node.js 只认识 JavaScript，不认识 TypeScript。
+  //   所以写代码用 .ts（有类型检查更安全），跑代码用编译后的 .js。
+  //
+  // 当前项目用 tsx 直接运行 .ts（开发模式），所以不手动编译。
+  // 但如果要部署到生产环境，需要 npm run build 编译。
+  // ============================================================
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "commonjs",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "sourceMap": true
+    // --- 编译目标 ---
+    "target": "ES2022",                // 编译成 ES2022 标准的 JavaScript（现代 Node.js 都支持）
+    "module": "commonjs",              // 模块系统：CommonJS（Node.js 传统格式，用 require() 导入）
+
+    // --- 输出目录 ---
+    "outDir": "./dist",                // 编译输出目录：.js 文件放到 dist/ 文件夹
+    "rootDir": "./src",                // 源码根目录：编译器只编译 src/ 下的 .ts 文件
+
+    // --- 严格模式 ---
+    "strict": true,                    // 开启所有严格类型检查（启用了就不能用 any，必须明确类型）
+
+    // --- 兼容性 ---
+    "esModuleInterop": true,           // 允许用 import 语法导入 CommonJS 模块（不再需要 require()）
+    "skipLibCheck": true,              // 跳过 .d.ts 类型文件的检查（加快编译速度）
+    "forceConsistentCasingInFileNames": true,  // 强制文件名大小写一致（macOS 不区分但 Linux 区分，防止部署出问题）
+    "resolveJsonModule": true,         // 允许 import 导入 .json 文件
+
+    // --- 生成文件 ---
+    "declaration": true,               // 生成 .d.ts 类型声明文件（给其他项目引用时用）
+    "sourceMap": true                  // 生成 .js.map 源码映射文件（调试时能定位到 .ts 原始行号）
   },
+
+  // 编译范围：只编译 src/ 下所有 .ts 文件
   "include": ["src/**/*.ts"],
+
+  // 排除：不编译 node_modules（第三方包的代码不需要编译）
   "exclude": ["node_modules"]
 }

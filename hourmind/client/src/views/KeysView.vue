@@ -1,4 +1,8 @@
-<!-- KeysView.vue —— API Key 管理页面 -->
+<!--
+  KeysView.vue —— API Key 管理页面
+  顶部统计卡片（总数/活跃/月消耗）+ 搜索筛选栏 + Key 卡片列表 + 添加弹窗
+  数据来自 keyStore，操作通过 wsClient.send('keys.*') 与后端通信
+-->
 <template>
   <div class="kp">
     <div class="kh"><h2>API Key 管理</h2><button class="btn-primary" @click="open">+ 添加新 Key</button></div>

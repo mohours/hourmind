@@ -9,14 +9,19 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret'
 
 // 首次设置密码
 registerRoute('auth.setup', async (payload): Promise<WsResponse> => {
+
   const { password } = payload
   if (!password || password.length < 4) return { success: false, error: { code: 'WEAK_PASSWORD', message: '密码至少4位' } }
+
   const existing = await prisma.appConfig.findUnique({ where: { key: 'password_hash' } })
   if (existing) return { success: false, error: { code: 'ALREADY_SETUP', message: '已设置过密码' } }
+
   const hash = await bcrypt.hash(password, 10)
   await prisma.appConfig.create({ data: { key: 'password_hash', value: hash } })
+
   const token = jwt.sign({ setup: true }, JWT_SECRET, { expiresIn: '24h' })
   return { success: true, data: { token, message: '密码设置成功' } }
+  
 })
 
 // 登录

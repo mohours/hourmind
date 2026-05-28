@@ -1,33 +1,63 @@
 {
+  "//_header": "package.json —— 项目依赖和脚本配置。这个文件告诉 npm 三件事：项目叫什么名字、依赖哪些第三方包、有哪些可执行的命令。",
+
   "name": "hourmind-server",
   "version": "1.0.0",
   "private": true,
+
+  "//_scripts_head": "=== 可执行命令：npm run xxx 会执行这里定义的命令 ===",
   "scripts": {
+    "//_dev": "开发模式：tsx 直接运行 TypeScript，watch 监听文件变化自动重启",
     "dev": "tsx watch src/index.ts",
+    "//_build": "生产构建：TypeScript 编译器 tsc 把 .ts 编译成 .js，输出到 dist/",
     "build": "tsc",
+    "//_db_migrate": "数据库迁移：根据 schema.prisma 创建/更新 SQLite 表结构",
     "db:migrate": "prisma migrate dev --name init",
+    "//_db_seed": "数据库种子：插入 7 家 AI 厂商的预置数据",
     "db:seed": "tsx src/seed.ts"
   },
+
+  "//_deps_head": "=== 运行时依赖（项目跑起来必需的第三方包）===",
   "dependencies": {
+    "//_express": "HTTP 框架：处理 REST API 请求，如 GET /api/health",
     "express": "^4.21.0",
+    "//_cors": "跨域中间件：允许前端 localhost:5173 访问后端 localhost:3000",
     "cors": "^2.8.5",
+    "//_ws": "WebSocket 库：实现前后端实时双向通信",
     "ws": "^8.18.0",
+    "//_prisma_client": "Prisma 数据库客户端：类型安全的 ORM（增删改查不用写 SQL）",
     "@prisma/client": "^5.22.0",
+    "//_dotenv": "环境变量：从 .env 文件读取 JWT_SECRET 等密钥配置",
     "dotenv": "^16.4.5",
+    "//_jwt": "JWT 令牌：生成和验证用户登录 Token",
     "jsonwebtoken": "^9.0.2",
+    "//_bcrypt": "密码哈希：把用户密码变成不可逆乱码存数据库",
     "bcryptjs": "^2.4.3",
+    "//_uuid": "UUID 生成：创建全局唯一 ID，用作数据库主键",
     "uuid": "^10.0.0"
   },
+
+  "//_devdeps_head": "=== 开发工具依赖（只在开发时需要，线上不用的工具）===",
   "devDependencies": {
+    "//_ts": "TypeScript 编译器：把 .ts 编译成 .js",
     "typescript": "^5.6.0",
+    "//_tsx": "TypeScript 执行器：不用先编译就能直接运行 .ts 文件",
     "tsx": "^4.19.0",
+    "//_prisma_cli": "Prisma CLI：数据库迁移命令、生成客户端代码",
     "prisma": "^5.22.0",
+    "//_types_express": "Express 的类型定义（TypeScript 类型检查需要）",
     "@types/express": "^5.0.0",
+    "//_types_cors": "CORS 的类型定义",
     "@types/cors": "^2.8.17",
+    "//_types_ws": "WebSocket 的类型定义",
     "@types/ws": "^8.5.13",
+    "//_types_jwt": "JWT 的类型定义",
     "@types/jsonwebtoken": "^9.0.7",
+    "//_types_bcrypt": "bcrypt 的类型定义",
     "@types/bcryptjs": "^2.4.6",
+    "//_types_uuid": "UUID 的类型定义",
     "@types/uuid": "^10.0.0",
+    "//_types_node": "Node.js 内置模块（fs/path/http等）的类型定义",
     "@types/node": "^22.0.0"
   }
 }

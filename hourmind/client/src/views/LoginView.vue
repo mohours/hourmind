@@ -1,4 +1,9 @@
-<!-- LoginView.vue —— 登录页 -->
+<!--
+  LoginView.vue —— 登录页面
+  已设置密码后，每次打开 HourMind 看到的页面
+  输入密码 → 调 appStore.login() → 后端 bcrypt.compare 验证 → 跳转首页
+  和 SetupView 共用 .auth-* 样式类
+-->
 <template>
   <div class="auth-page">
     <div class="glass-card auth-card">
