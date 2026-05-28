@@ -45,6 +45,14 @@
           </div>
           <span class="user-name">Claude 4</span>
         </div>
+        <!-- 右侧面板切换按钮 -->
+        <button class="header-btn" :class="{ active: showPanel }" title="会话信息" @click="showPanel = !showPanel">
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="16" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="12" y1="8" x2="12.01" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
         <button class="header-btn" title="关闭">
           <svg viewBox="0 0 24 24" fill="none">
             <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -72,8 +80,11 @@
       </div>
     </div>
 
-    <!-- ===== 消息列表 ===== -->
-    <div class="messages-container">
+    <!-- ===== 主体内容（消息区 + 右侧面板）===== -->
+    <div class="chat-body">
+      <div class="chat-main">
+        <!-- ===== 消息列表 ===== -->
+        <div class="messages-container">
       <ChatMessageList v-if="cs.activeId" @regenerate="cs.regenerateLast()" />
 
       <!-- 欢迎页（无活跃会话时） -->
@@ -132,6 +143,18 @@
               <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
           </button>
+          <!-- 联网搜索开关 -->
+          <button
+            class="action-btn"
+            :class="{ 'search-active': cs.webSearchEnabled }"
+            :title="cs.webSearchEnabled ? '已开启联网搜索' : '开启联网搜索'"
+            @click="cs.webSearchEnabled = !cs.webSearchEnabled"
+          >
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
         </div>
 
         <!-- 输入框 -->
@@ -166,7 +189,32 @@
         </div>
       </div>
     </div>
+
+    <!-- ===== 右侧辅助面板 ===== -->
+    <div v-if="showPanel && cs.activeId" class="right-panel glass-card">
+      <h3 class="panel-title">会话信息</h3>
+      <div class="panel-field">
+        <span class="panel-label">当前模型</span>
+        <span class="panel-value text-cyan">{{ cs.currentModel }}</span>
+      </div>
+      <div class="panel-field">
+        <span class="panel-label">消息数</span>
+        <span class="panel-value">{{ cs.messages.length }}</span>
+      </div>
+      <div class="panel-field">
+        <span class="panel-label">Token 消耗</span>
+        <span class="panel-value">{{ totalTokens }}</span>
+      </div>
+      <div class="panel-field">
+        <span class="panel-label">会话总数</span>
+        <span class="panel-value">{{ cs.conversations.length }}</span>
+      </div>
+      <hr class="panel-divider" />
+      <button class="panel-btn" @click="cs.regenerateLast()" :disabled="cs.isStreaming || cs.messages.length < 2">🔄 重新生成</button>
+      <button class="panel-btn" @click="cs.createConversation()">➕ 新建会话</button>
+    </div>
   </div>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -180,6 +228,14 @@ import ChatMessageList from '@/components/ChatMessageList.vue'
 // ==================== 初始化 ====================
 
 const cs = useChatStore()
+
+// 右侧面板开关
+const showPanel = ref(false)
+
+// 计算 Token 消耗（从消息中累加）
+const totalTokens = computed(() =>
+  cs.messages.reduce((sum, m) => sum + (m.tokenCount || 0), 0)
+)
 
 onMounted(async () => {
   await cs.fetchConversations() // 先加载会话列表
@@ -257,6 +313,33 @@ function sendMessage() {
   height: 100%;
   background: linear-gradient(180deg, #0D1117 0%, #0A0C12 100%);
 }
+
+/* ===== 主布局（消息 + 右侧面板）===== */
+.chat-body { display: flex; flex: 1; min-height: 0; }
+.chat-main { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+
+/* ===== 右侧辅助面板 ===== */
+.right-panel {
+  width: 280px; flex-shrink: 0; padding: 20px;
+  margin: 12px 12px 12px 0; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.panel-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.panel-field { display: flex; justify-content: space-between; align-items: center; }
+.panel-label { font-size: 13px; color: #94A3B8; }
+.panel-value { font-size: 14px; font-weight: 500; color: #E2E8F0; }
+.text-cyan { color: #00E5D8 !important; }
+.panel-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 0; }
+.panel-btn {
+  width: 100%; padding: 10px; background: rgba(0,229,216,0.08);
+  border: 1px solid rgba(0,229,216,0.15); border-radius: 10px;
+  color: #00E5D8; cursor: pointer; font-size: 13px; transition: all 0.2s;
+}
+.panel-btn:hover:not(:disabled) { background: rgba(0,229,216,0.15); }
+.panel-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* 面板开关激活态 */
+.header-btn.active { background: rgba(0,229,216,0.15); color: #00E5D8; }
 
 /* ==================== 顶部栏 ==================== */
 
@@ -544,6 +627,12 @@ function sendMessage() {
 .action-btn svg {
   width: 18px;
   height: 18px;
+}
+
+/* 联网搜索激活态：量子青高亮 */
+.action-btn.search-active {
+  background: rgba(0, 229, 216, 0.15);
+  color: #00E5D8;
 }
 
 /* 输入框 */

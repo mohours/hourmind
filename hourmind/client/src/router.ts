@@ -32,6 +32,8 @@ export const router = createRouter({
     { path: '/keys', name: 'keys', component: () => import('@/views/KeysView.vue') },
     { path: '/chat', name: 'chat', component: () => import('@/views/ChatView.vue') },
     { path: '/history', name: 'history', component: () => import('@/views/HistoryView.vue') },
+    { path: '/tasks', name: 'tasks', component: () => import('@/views/TasksView.vue') },
+    { path: '/knowledge', name: 'knowledge', component: () => import('@/views/KnowledgeView.vue') },
     { path: '/settings', name: 'settings', component: () => import('@/views/SettingsView.vue') },
     { path: '/', name: 'dashboard', component: () => import('@/views/DashboardView.vue') },
   ],

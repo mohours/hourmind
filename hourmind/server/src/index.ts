@@ -43,6 +43,8 @@ import './handlers/chatHandler' // conversations.* / messages.*
 import './handlers/dashboardHandler' // dashboard.summary
 import './handlers/historyHandler' // history.*
 import './handlers/settingsHandler' // settings.get / settings.update
+import './handlers/taskHandler' // tasks.* / subtasks.*
+import './handlers/knowledgeHandler' // knowledge.* / knowledge.cards.*
 
 // ==================== 创建 Express 应用 ====================
 const app = express()

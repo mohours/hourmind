@@ -11,7 +11,10 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">import { useChatStore } from '@/stores/chatStore'; const cs = useChatStore()</script>
+<script setup lang="ts">
+import { useChatStore } from '@/stores/chatStore'
+const cs = useChatStore()
+</script>
 <style scoped>
 .csb { width:280px; min-width:280px; height:100%; background:rgba(16,18,27,0.6); border-right:1px solid rgba(0,229,216,0.1); display:flex; flex-direction:column }
 .nb { margin:12px; width:calc(100% - 24px) }

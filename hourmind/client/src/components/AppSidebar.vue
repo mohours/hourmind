@@ -14,12 +14,17 @@
       <router-link to="/chat" class="ni" active-class="na"><span class="ni-icon">💬</span>智能对话</router-link>
       <router-link to="/keys" class="ni" active-class="na"><span class="ni-icon">🔑</span>API Key</router-link>
       <router-link to="/history" class="ni" active-class="na"><span class="ni-icon">📋</span>历史记录</router-link>
+      <router-link to="/tasks" class="ni" active-class="na"><span class="ni-icon">✅</span>待办事项</router-link>
+      <router-link to="/knowledge" class="ni" active-class="na"><span class="ni-icon">📚</span>知识库</router-link>
       <router-link to="/settings" class="ni" active-class="na"><span class="ni-icon">⚙️</span>系统设置</router-link>
     </nav>
     <div class="ft"><button class="lo" @click="a.logout()">退出登录</button></div>
   </aside>
 </template>
-<script setup lang="ts">import { useAppStore } from '@/stores/appStore'; const a = useAppStore()</script>
+<script setup lang="ts">
+import { useAppStore } from '@/stores/appStore'
+const a = useAppStore()
+</script>
 <style scoped>
 .sb { width:260px; min-width:260px; height:100vh; background:rgba(16,18,27,0.8); backdrop-filter:blur(20px); border-right:1px solid rgba(0,229,216,0.12); display:flex; flex-direction:column }
 .logo { padding:24px 20px; border-bottom:1px solid rgba(0,229,216,0.08) }

@@ -61,6 +61,7 @@ export const useChatStore = defineStore('chat', () => {
   const loading = ref(false)                       // 加载中
   const isStreaming = ref(false)                   // 是否在流式输出
   const currentModel = ref('deepseek-v4-pro')      // 当前模型
+  const webSearchEnabled = ref(false)               // 联网搜索开关
 
   // ——— 工具函数 ———
 
@@ -175,11 +176,13 @@ export const useChatStore = defineStore('chat', () => {
     isStreaming.value = true
 
     try {
-      // 4. 发送消息（返回 { mode: 'stream', assistant_message_id, ... }）
+      // 4. 发送消息
+      //    如果 webSearchEnabled=true，带上 webSearch 标记发送给后端
       const init = await wsClient.send('messages.send', {
         conversationId: convId,
         content,
         model: currentModel.value,
+        webSearch: webSearchEnabled.value || undefined,
       })
 
       if (init.mode === 'stream') {
@@ -325,6 +328,7 @@ export const useChatStore = defineStore('chat', () => {
 
   return {
     conversations, activeId, messages, loading, isStreaming, currentModel,
+    webSearchEnabled,
     fetchConversations, createConversation, selectConversation, deleteConversation,
     sendMessage, regenerateLast,
   }

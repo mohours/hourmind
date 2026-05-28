@@ -24,6 +24,8 @@ import { prisma } from '../db'
 import { registerRoute } from '../wsRouter'
 import type { WsResponse } from '../wsRouter'
 import { streamChat } from '../services/aiService'
+// 联网搜索服务：用户开启搜索开关时，先把消息当关键词搜索，结果注入 AI 上下文
+import { webSearch, formatSearchResults } from '../services/searchService'
 
 // ==================== conversations.list ====================
 // 获取会话列表（左侧栏显示用）
@@ -113,14 +115,18 @@ registerRoute('messages.list', async (payload): Promise<WsResponse> => {
 
 // ==================== messages.send（核心）============
 // 发送消息并以流式方式获取 AI 回复
-// payload: { conversationId, content, model? }
+// payload: { conversationId, content, model?, webSearch? }
+//
+// 如果 webSearch=true，会先用用户消息作为关键词搜索网络，
+// 把搜索结果拼入 AI 上下文，让 AI 能基于实时信息回答。
 //
 // 整个流程分三个部分：
 //   A. 同步准备：校验会话、找 Key、保存用户消息、创建 AI 占位、更新会话
-//   B. 异步流式调用：调 AI 厂商 API，逐 token 推送到前端
-//   C. 立即返回：告诉前端流式即将开始
+//   B. (可选) 联网搜索：把搜索结果注入到消息上下文
+//   C. 异步流式调用：调 AI 厂商 API，逐 token 推送到前端
+//   D. 立即返回：告诉前端流式即将开始
 registerRoute('messages.send', async (payload, _token, ctx): Promise<WsResponse> => {
-  const { conversationId, content, model } = payload
+  const { conversationId, content, model, webSearch: doSearch } = payload
 
   // ==================== A. 同步准备 ====================
 
@@ -193,12 +199,38 @@ registerRoute('messages.send', async (payload, _token, ctx): Promise<WsResponse>
 
   // 把数据库消息转成 AI API 的格式
   // { role: "user" | "assistant", content: "..." }
-  const apiMessages = history.map(m => ({
+  let apiMessages = history.map(m => ({
     role: m.role === 'assistant' ? 'assistant' : 'user',
     content: m.content,
   }))
 
-  // ==================== B. 异步流式调用 ====================
+  // ==================== B. 联网搜索（可选）====================
+  // 如果用户开启了"联网搜索"开关，先把消息作为关键词搜索网络，
+  // 把搜索结果注入到最后一条消息（用户刚发的）前面作为上下文
+  if (doSearch) {
+    console.log('🔍 联网搜索中:', content.slice(0, 50))
+    const searchResults = await webSearch(content, 5) // 搜索前 5 条结果
+
+    if (searchResults.length > 0) {
+      // 格式化搜索结果为纯文本
+      const searchText = formatSearchResults(searchResults)
+      // 在用户消息前面插入 system 消息，告诉 AI 搜索结果是可靠的参考信息
+      // 这样 AI 就能基于实时网络信息回答
+      apiMessages = [
+        {
+          role: 'system',
+          content:
+            `以下是用户问题的网络搜索结果。请基于这些信息回答用户的问题。如果搜索结果不相关或不够新，请如实告知。\n\n${searchText}`,
+        },
+        ...apiMessages, // 原有的对话历史
+      ]
+      console.log(`✅ 搜索完成，获取 ${searchResults.length} 条结果`)
+    } else {
+      console.log('⚠️ 搜索无结果')
+    }
+  }
+
+  // ==================== C. 异步流式调用 ====================
 
   // fullContent 数组收集所有文本碎片
   // 用数组而不是字符串拼接，是为了提高性能
