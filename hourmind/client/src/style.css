@@ -1,0 +1,507 @@
+/* client/src/style.css */
+/* Quantum Flow —— 量子流全局主题：深空背景 + 浮动光球 + 磨砂玻璃 + 流光动效 */
+
+/* ================================================================ */
+/*  Google Font 导入 —— Chakra Petch 科技字体                         */
+/* ================================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&display=swap');
+
+/* ================================================================ */
+/*  CSS 自定义属性（变量名保持不变，确保现有组件兼容）                    */
+/* ================================================================ */
+:root {
+  /* 背景色系 */
+  --bg-primary: #06070D;                    /* 深空底色 */
+
+  /* 玻璃面板 */
+  --glass-bg: rgba(14, 16, 26, 0.82);        /* 磨砂玻璃底色（提高不透明度，增强质感） */
+
+  /* 品牌色 */
+  --accent: #00E5D8;                         /* 量子青 —— 主品牌色 */
+  --accent-blue: #3b82f6;                    /* 流光蓝 */
+  --accent-purple: #a855f7;                  /* 星云紫 */
+  --accent-indigo: #6366f1;                  /* 深空靛 */
+
+  /* 文字 */
+  --text-primary: #F1F5F9;                   /* 主文字 —— 接近纯白 */
+  --text-secondary: #94A3B8;                 /* 辅文字 —— 灰蓝 */
+
+  /* 边框发光 */
+  --border-glow: rgba(0, 229, 216, 0.18);    /* 边框辉光 */
+
+  /* 语义色 */
+  --success: #34D399;                        /* 成功绿 */
+  --warning: #FB923C;                        /* 警告橙 */
+  --danger: #EF4444;                         /* 危险红 */
+
+  /* 圆角 */
+  --radius: 16px;                            /* 全局主圆角 */
+
+  /* 字体栈 */
+  --font-tech: 'Chakra Petch', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+}
+
+/* ================================================================ */
+/*  CSS Houdini @property —— 流光旋转角度自定义属性                    */
+/* ================================================================ */
+@property --angle {
+  syntax: '<angle>';                         /* 角度类型 */
+  initial-value: 0deg;                       /* 初始角度 */
+  inherits: false;                           /* 不继承 */
+}
+
+/* ================================================================ */
+/*  关键帧动画                                                       */
+/* ================================================================ */
+
+/* 流光边框旋转 —— conic-gradient 无限转动 */
+@keyframes border-rotate {
+  to { --angle: 360deg; }
+}
+
+/* 渐变流动 —— background-position 来回滑动 */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* 浮动光球 —— 缓慢上下漂浮（8s 周期） */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  25% { transform: translateY(-18px) scale(1.04); }
+  50% { transform: translateY(-8px) scale(1.01); }
+  75% { transform: translateY(-26px) scale(1.06); }
+}
+
+/* 浮动光球 2 —— 节奏偏移的反向漂浮 */
+@keyframes float-reverse {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  30% { transform: translateY(22px) scale(1.03); }
+  60% { transform: translateY(6px) scale(0.98); }
+  85% { transform: translateY(30px) scale(1.05); }
+}
+
+/* 辉光呼吸 —— 光球透明度匀速脉动 */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.75; }
+}
+
+/* 辉光呼吸 2 —— 相位偏移，形成交叠节奏 */
+@keyframes pulse-glow-alt {
+  0%, 100% { opacity: 0.50; }
+  33% { opacity: 0.20; }
+  66% { opacity: 0.80; }
+}
+
+/* 按钮点击弹性 —— scale 先压缩再回弹 */
+@keyframes btn-bounce {
+  0% { transform: scale(1); }
+  35% { transform: scale(0.90); }
+  65% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+/* 输入框聚焦辉光扩散 */
+@keyframes input-glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--accent), 0 0 20px rgba(0, 229, 216, 0.25), 0 0 40px rgba(99, 102, 241, 0.10); }
+  50% { box-shadow: 0 0 0 2px var(--accent), 0 0 32px rgba(0, 229, 216, 0.45), 0 0 60px rgba(99, 102, 241, 0.20); }
+}
+
+/* ================================================================ */
+/*  全局重置                                                         */
+/* ================================================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ================================================================ */
+/*  页面主体 —— 深空背景 + 浮动光球网格                              */
+/* ================================================================ */
+body {
+  font-family: var(--font-tech);             /* 科技字体 + 中文字体回退 */
+  background-color: var(--bg-primary);       /* 深空底色 */
+  color: var(--text-primary);                /* 主文字色 */
+  min-height: 100vh;                         /* 至少撑满视口 */
+  position: relative;                        /* 为伪元素提供定位参照 */
+  overflow-x: hidden;                        /* 防止水平滚动条 */
+}
+
+/* 浮动光球层 1 —— 左上量子青巨球 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;                               /* 置于所有内容之下 */
+  pointer-events: none;                      /* 不阻挡鼠标事件 */
+  background:
+    /* 光球 1：量子青，左上区域 */
+    radial-gradient(ellipse 900px 700px at 15% 25%, rgba(0, 229, 216, 0.07) 0%, transparent 70%),
+    /* 光球 2：深空靛，右下区域 */
+    radial-gradient(ellipse 800px 600px at 80% 75%, rgba(99, 102, 241, 0.06) 0%, transparent 70%),
+    /* 光球 3：星云紫，中上微弱 */
+    radial-gradient(ellipse 500px 400px at 50% 10%, rgba(168, 85, 247, 0.04) 0%, transparent 70%);
+  animation: float 10s ease-in-out infinite; /* 缓慢漂浮 */
+}
+
+/* 浮动光球层 2 —— 右侧星云紫 + 底部流光蓝 */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;                               /* 在层 1 之上，内容之下 */
+  pointer-events: none;                      /* 不阻挡鼠标事件 */
+  background:
+    /* 光球 4：星云紫，右中区域 */
+    radial-gradient(ellipse 700px 600px at 90% 40%, rgba(168, 85, 247, 0.06) 0%, transparent 70%),
+    /* 光球 5：流光蓝，左下区域 */
+    radial-gradient(ellipse 600px 500px at 20% 85%, rgba(59, 130, 246, 0.05) 0%, transparent 70%),
+    /* 光球 6：量子青微光，中心偏右 */
+    radial-gradient(ellipse 400px 350px at 60% 55%, rgba(0, 229, 216, 0.03) 0%, transparent 65%);
+  animation: float-reverse 12s ease-in-out infinite; /* 反向漂浮，与层 1 形成交错 */
+}
+
+/* ================================================================ */
+/*  全局滚动条 —— 蓝紫渐变流光                                        */
+/* ================================================================ */
+::-webkit-scrollbar {
+  width: 6px;                                /* 窄滚动条 */
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(30, 25, 50, 0.5);         /* 深色轨道 */
+  border-radius: 3px;                        /* 小圆角 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent-indigo), var(--accent-purple), var(--accent-blue));
+  border-radius: 3px;                        /* 小圆角 */
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.3); /* 辉光 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.55); /* 悬停增强辉光 */
+}
+
+/* ================================================================ */
+/*  文字选中样式                                                     */
+/* ================================================================ */
+::selection {
+  background: rgba(0, 229, 216, 0.25);       /* 量子青半透明选中背景 */
+  color: #fff;                               /* 白色文字 */
+}
+
+/* ================================================================ */
+/*  流光玻璃卡片 —— 磨砂玻璃 + 旋转渐变光边 + 内反光                  */
+/* ================================================================ */
+.glass-card {
+  position: relative;                        /* 为伪元素定位 */
+  background: var(--glass-bg);               /* 磨砂玻璃底色 */
+  backdrop-filter: blur(32px);               /* 深度模糊 —— 量子流增强 */
+  -webkit-backdrop-filter: blur(32px);       /* Safari 兼容 */
+  border: 2px solid transparent;             /* 透明边框占位，实际由 ::before 渲染 */
+  border-radius: var(--radius);              /* 主圆角 */
+  background-clip: padding-box;              /* 背景裁剪到 padding 区域 */
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.5),           /* 底部投影 */
+    0 0 1px rgba(255, 255, 255, 0.05) inset;  /* 微弱内边框 */
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  z-index: 0;                                /* 创建局部层叠上下文 */
+}
+
+/* 流光色圈 —— conic-gradient 旋转渐变覆盖 border 区域 */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;                               /* 与 border 2px 对齐 */
+  border-radius: inherit;                    /* 继承父圆角 */
+  padding: 2px;                              /* 渐变线宽 */
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    var(--accent), var(--accent-indigo), var(--accent-purple),
+    var(--accent-blue), var(--accent)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;               /* 只显示 border 区域的渐变 */
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;                   /* 只显示 border 区域的渐变 */
+  z-index: -1;                               /* 在卡片内容之下 */
+  animation: border-rotate 4s linear infinite; /* 边框流光旋转 */
+}
+
+/* 内反光 —— 左上角高光模拟玻璃折射（量子流新增） */
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: 8px;                                  /* 距离顶部 */
+  left: 12px;                                /* 距离左侧 */
+  width: 35%;                                /* 覆盖左上角区域 */
+  height: 30%;
+  background: radial-gradient(
+    ellipse at 0% 0%,
+    rgba(255, 255, 255, 0.08) 0%,            /* 中心微白 */
+    rgba(255, 255, 255, 0.02) 40%,           /* 扩散淡化 */
+    transparent 70%                           /* 完全透明 */
+  );
+  border-radius: inherit;                    /* 继承圆角 */
+  pointer-events: none;                      /* 不阻挡交互 */
+  z-index: 1;                                /* 在内容之上（微弱覆盖） */
+  animation: pulse-glow 6s ease-in-out infinite; /* 呼吸脉动 */
+}
+
+/* 悬停效果：上浮 + 增强辉光 */
+.glass-card:hover {
+  transform: translateY(-6px);               /* 加大上浮距离 */
+  box-shadow:
+    0 12px 40px rgba(99, 102, 241, 0.20),    /* 靛蓝发光 */
+    0 0 0 1px rgba(168, 85, 247, 0.10) inset, /* 内紫边 */
+    0 0 80px rgba(0, 229, 216, 0.08);         /* 远距离量子青辉光 */
+}
+
+/* ================================================================ */
+/*  主按钮 —— 流光渐变 + 弹性点击                                     */
+/* ================================================================ */
+.btn-primary {
+  position: relative;                        /* 为可能的伪元素预留 */
+  background: linear-gradient(
+    135deg,
+    var(--accent), var(--accent-blue), var(--accent-indigo), var(--accent)
+  );
+  background-size: 300% 300%;               /* 放大背景以实现流动 */
+  color: #fff;                               /* 白色文字 */
+  border: none;                              /* 无边框 */
+  border-radius: var(--radius);              /* 主圆角 */
+  padding: 12px 24px;                        /* 内边距 */
+  font-size: 16px;                           /* 字号 */
+  font-weight: 600;                          /* 加粗 */
+  cursor: pointer;                           /* 手型光标 */
+  animation: gradient-shift 3s ease infinite; /* 渐变流动 */
+  transition: box-shadow 0.3s ease;           /* 辉光平滑过渡（transform 由点击动画控制） */
+  box-shadow: 0 0 20px rgba(0, 229, 216, 0.25); /* 默认量子青辉光 */
+}
+
+/* 悬停：增强辉光 */
+.btn-primary:hover {
+  box-shadow:
+    0 0 36px rgba(0, 229, 216, 0.55),        /* 近距强辉光 */
+    0 0 70px rgba(99, 102, 241, 0.25);        /* 远距靛蓝辉光 */
+}
+
+/* 点击：弹性缩放弹跳 */
+.btn-primary:active {
+  animation:
+    gradient-shift 3s ease infinite,           /* 保持渐变流动 */
+    btn-bounce 0.35s ease;                     /* 播放弹性弹跳 */
+}
+
+/* 禁用状态 */
+.btn-primary:disabled {
+  opacity: 0.4;                              /* 半透明示意不可用 */
+  cursor: not-allowed;                       /* 禁止光标 */
+  animation: none;                           /* 停止动画 */
+  box-shadow: none;                          /* 移除辉光 */
+}
+
+/* ================================================================ */
+/*  危险按钮                                                         */
+/* ================================================================ */
+.btn-danger {
+  background: transparent;                   /* 透明底 */
+  color: var(--danger);                      /* 红色文字 */
+  border: 1px solid rgba(239, 68, 68, 0.4);  /* 半透明红边框 */
+  border-radius: var(--radius);              /* 主圆角 */
+  padding: 12px 24px;                        /* 内边距 */
+  font-size: 16px;                           /* 字号 */
+  cursor: pointer;                           /* 手型光标 */
+  transition: all 0.25s ease;                /* 全属性过渡 */
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.10);       /* 淡红底色 */
+  border-color: var(--danger);               /* 边框变实 */
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.25); /* 红色辉光 */
+}
+
+.btn-danger:active {
+  animation: btn-bounce 0.35s ease;          /* 弹性点击 */
+}
+
+/* ================================================================ */
+/*  输入框 —— 玻璃质感 + 聚焦辉光扩散                                 */
+/* ================================================================ */
+.auth-input,
+input[type="text"],
+input[type="password"],
+input[type="search"],
+select,
+textarea {
+  width: 100%;                               /* 撑满容器 */
+  padding: 12px 16px;                        /* 内边距 */
+  margin-bottom: 12px;                       /* 底部间距 */
+  background: rgba(255, 255, 255, 0.04);     /* 微透明底色 */
+  border: 1px solid var(--border-glow);       /* 辉光边框 */
+  border-radius: 12px;                       /* 小圆角 */
+  color: var(--text-primary);                /* 主文字色 */
+  font-size: 15px;                           /* 字号 */
+  font-family: inherit;                      /* 继承字体栈 */
+  outline: none;                             /* 移除默认外框 */
+  transition:
+    border-color 0.3s ease,                  /* 边框色过渡 */
+    box-shadow 0.3s ease;                     /* 辉光过渡 */
+}
+
+/* 占位文字 */
+.auth-input::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-secondary);              /* 辅色占位 */
+  opacity: 0.7;                              /* 略透明 */
+}
+
+/* 聚焦状态 —— 戏剧性辉光扩散 */
+.auth-input:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+select:focus,
+textarea:focus {
+  border-color: transparent;                 /* 隐藏原边框 */
+  animation: input-glow-pulse 2.5s ease-in-out infinite; /* 脉冲辉光 */
+}
+
+/* 自动填充覆盖 —— 避免浏览器默认黄色背景 */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-primary);             /* 保持文字色 */
+  -webkit-box-shadow: 0 0 0px 1000px rgba(14, 16, 26, 1) inset; /* 深色背景覆盖 */
+  transition: background-color 5000s ease-in-out 0s;         /* 延迟过渡防止闪烁 */
+}
+
+/* ================================================================ */
+/*  认证页面 —— 深空径向渐变 + 浮动光球                               */
+/* ================================================================ */
+.auth-container {
+  min-height: 100vh;                         /* 撑满视口 */
+  display: flex;                             /* 弹性布局 */
+  flex-direction: column;                    /* 纵向排列 */
+  align-items: center;                       /* 水平居中 */
+  justify-content: center;                   /* 垂直居中 */
+  gap: 24px;                                 /* 元素间距 */
+  position: relative;                        /* 为光球伪元素定位 */
+  /* 多层径向渐变模拟深空辉光基底 */
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 70%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 60%, rgba(0, 229, 216, 0.04) 0%, transparent 45%);
+  overflow: hidden;                          /* 裁剪溢出光球 */
+}
+
+/* 认证页面浮动光球 —— 左上量子青 */
+.auth-container::before {
+  content: '';
+  position: absolute;
+  top: 10%;                                  /* 距顶 10% */
+  left: 10%;                                 /* 距左 10% */
+  width: 500px;                              /* 光球宽度 */
+  height: 500px;                             /* 光球高度 */
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 229, 216, 0.10) 0%,              /* 中心量子青 */
+    rgba(0, 229, 216, 0.03) 40%,             /* 扩散淡化 */
+    transparent 70%                            /* 完全透明 */
+  );
+  border-radius: 50%;                        /* 圆形光球 */
+  filter: blur(60px);                        /* 高斯模糊制造光晕 */
+  pointer-events: none;                      /* 不阻挡交互 */
+  animation:
+    float 8s ease-in-out infinite,            /* 漂浮 */
+    pulse-glow 5s ease-in-out infinite;        /* 呼吸 */
+}
+
+/* 认证页面浮动光球 —— 右下星云紫 */
+.auth-container::after {
+  content: '';
+  position: absolute;
+  bottom: 15%;                               /* 距底 15% */
+  right: 12%;                                /* 距右 12% */
+  width: 450px;                              /* 光球宽度 */
+  height: 450px;                             /* 光球高度 */
+  background: radial-gradient(
+    circle at center,
+    rgba(168, 85, 247, 0.09) 0%,             /* 中心星云紫 */
+    rgba(99, 102, 241, 0.03) 40%,            /* 靛蓝过渡 */
+    transparent 70%                            /* 完全透明 */
+  );
+  border-radius: 50%;                        /* 圆形光球 */
+  filter: blur(60px);                        /* 高斯模糊制造光晕 */
+  pointer-events: none;                      /* 不阻挡交互 */
+  animation:
+    float-reverse 10s ease-in-out infinite,   /* 反向漂浮 */
+    pulse-glow-alt 6s ease-in-out infinite;    /* 交替呼吸 */
+}
+
+/* 认证标题 —— 流光渐变文字 */
+.auth-container h1,
+.auth-title {
+  font-size: 48px;                           /* 大标题字号 */
+  font-weight: 700;                          /* 粗体 */
+  background: linear-gradient(
+    135deg,
+    var(--accent), var(--accent-blue), var(--accent-purple)
+  );
+  background-size: 200% 200%;                /* 放大背景流动 */
+  -webkit-background-clip: text;             /* 文字裁剪背景 */
+  -webkit-text-fill-color: transparent;      /* 透明文字露出背景 */
+  background-clip: text;                     /* 标准属性 */
+  letter-spacing: 3px;                       /* 字符间距 */
+  animation: gradient-shift 4s ease infinite; /* 渐变流动 */
+  text-shadow: 0 0 40px rgba(0, 229, 216, 0.15); /* 文字辉光 */
+}
+
+/* 认证副标题 */
+.auth-subtitle {
+  color: var(--text-secondary);              /* 辅色文字 */
+  font-size: 16px;                           /* 字号 */
+  font-weight: 400;                          /* 常规字重 */
+  margin-bottom: 8px;                        /* 底部间距 */
+  letter-spacing: 1px;                       /* 微字符间距 */
+}
+
+/* 错误提示文字 */
+.error-text {
+  color: var(--danger);                      /* 红色 */
+  font-size: 13px;                           /* 小字号 */
+  margin: 4px 0;                             /* 上下间距 */
+  font-weight: 500;                          /* 中等字重 */
+}
+
+/* ================================================================ */
+/*  占位页面                                                         */
+/* ================================================================ */
+.placeholder-page {
+  min-height: 100vh;                         /* 撑满视口 */
+  display: flex;                             /* 弹性布局 */
+  align-items: center;                       /* 垂直居中 */
+  justify-content: center;                   /* 水平居中 */
+  color: var(--text-secondary);              /* 辅色 */
+  font-size: 20px;                           /* 字号 */
+}
+
+/* ================================================================ */
+/*  响应式微调                                                       */
+/* ================================================================ */
+@media (max-width: 768px) {
+  .auth-container h1,
+  .auth-title {
+    font-size: 36px;                         /* 移动端缩小标题 */
+    letter-spacing: 2px;                     /* 减小字符间距 */
+  }
+
+  .glass-card {
+    backdrop-filter: blur(20px);             /* 移动端降低模糊性能开销 */
+    -webkit-backdrop-filter: blur(20px);
+  }
+}

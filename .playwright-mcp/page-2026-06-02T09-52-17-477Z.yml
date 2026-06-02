@@ -1,0 +1,64 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e4] [cursor=pointer]:
+      - generic [ref=e5]: ⚡
+      - generic [ref=e6]: HourMind
+    - generic [ref=e7]:
+      - link "📊 仪表盘" [ref=e8] [cursor=pointer]:
+        - /url: "#/"
+        - generic [ref=e9]: 📊
+        - generic [ref=e10]: 仪表盘
+      - link "💬 对话" [ref=e11] [cursor=pointer]:
+        - /url: "#/chat"
+        - generic [ref=e12]: 💬
+        - generic [ref=e13]: 对话
+      - link "🔑 API Keys" [ref=e14] [cursor=pointer]:
+        - /url: "#/keys"
+        - generic [ref=e15]: 🔑
+        - generic [ref=e16]: API Keys
+      - link "✅ 待办" [ref=e17] [cursor=pointer]:
+        - /url: "#/tasks"
+        - generic [ref=e18]: ✅
+        - generic [ref=e19]: 待办
+      - link "📚 知识库" [ref=e20] [cursor=pointer]:
+        - /url: "#/knowledge"
+        - generic [ref=e21]: 📚
+        - generic [ref=e22]: 知识库
+      - link "📋 历史" [ref=e23] [cursor=pointer]:
+        - /url: "#/history"
+        - generic [ref=e24]: 📋
+        - generic [ref=e25]: 历史
+      - link "⚙️ 设置" [ref=e26] [cursor=pointer]:
+        - /url: "#/settings"
+        - generic [ref=e27]: ⚙️
+        - generic [ref=e28]: 设置
+    - button "退出登录" [ref=e30] [cursor=pointer]
+  - main [ref=e31]:
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - heading "HourMind 小时智脑" [level=1] [ref=e34]
+        - paragraph [ref=e35]: 私人第二大脑 + 多模型 AI 助理
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - paragraph [ref=e38]: 今日 Token 用量
+          - paragraph [ref=e39]: "0"
+        - generic [ref=e40]:
+          - paragraph [ref=e41]: 活跃 Keys
+          - paragraph [ref=e42]: "0"
+        - generic [ref=e43]:
+          - paragraph [ref=e44]: 对话总数
+          - paragraph [ref=e45]: "0"
+      - generic [ref=e46]:
+        - heading "最近对话" [level=3] [ref=e47]
+        - generic [ref=e49] [cursor=pointer]:
+          - generic [ref=e50]:
+            - paragraph [ref=e51]: 你好
+            - paragraph [ref=e52]: default · 10 条消息
+          - generic [ref=e53]: 8 小时前
+      - generic [ref=e54]:
+        - heading "快捷操作" [level=3] [ref=e55]
+        - generic [ref=e56]:
+          - button "开始新对话" [ref=e57] [cursor=pointer]
+          - button "管理 Keys" [ref=e58] [cursor=pointer]
+          - button "待办事项" [ref=e59] [cursor=pointer]
+          - button "知识库" [ref=e60] [cursor=pointer]

@@ -1,0 +1,24 @@
+- generic [ref=e12]:
+  - generic [ref=e13]:
+    - heading "HourMind 小时智脑" [level=1] [ref=e14]
+    - paragraph [ref=e15]: 私人第二大脑 + 多模型 AI 助理
+  - generic [ref=e16]:
+    - generic [ref=e17]:
+      - paragraph [ref=e18]: 今日 Token 用量
+      - paragraph [ref=e19]: "0"
+    - generic [ref=e20]:
+      - paragraph [ref=e21]: 活跃 Keys
+      - paragraph [ref=e22]: "0"
+    - generic [ref=e23]:
+      - paragraph [ref=e24]: 对话总数
+      - paragraph [ref=e25]: "0"
+  - generic [ref=e26]:
+    - heading "最近对话" [level=3] [ref=e27]
+    - generic [ref=e28]: 暂无对话记录，点击下方"开始新对话"开始
+  - generic [ref=e29]:
+    - heading "快捷操作" [level=3] [ref=e30]
+    - generic [ref=e31]:
+      - button "开始新对话" [ref=e32] [cursor=pointer]
+      - button "管理 Keys" [ref=e33] [cursor=pointer]
+      - button "待办事项" [ref=e34] [cursor=pointer]
+      - button "知识库" [ref=e35] [cursor=pointer]

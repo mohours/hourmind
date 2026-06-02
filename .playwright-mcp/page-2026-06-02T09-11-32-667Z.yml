@@ -1,0 +1,9 @@
+- generic [ref=e3]:
+  - heading "HourMind" [level=1] [ref=e4]
+  - paragraph [ref=e5]: 小时智脑 · 首次设置
+  - generic [ref=e6]:
+    - heading "设置主密码" [level=2] [ref=e7]
+    - paragraph [ref=e8]: 这是您访问 HourMind 的唯一凭证，请妥善保管
+    - textbox "输入密码（至少 6 位）" [ref=e9]
+    - textbox "确认密码" [ref=e10]
+    - button "开始使用" [ref=e11] [cursor=pointer]

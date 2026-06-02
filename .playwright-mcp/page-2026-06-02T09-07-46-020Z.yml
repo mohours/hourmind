@@ -1,0 +1,7 @@
+- generic [ref=e3]:
+  - heading "HourMind" [level=1] [ref=e4]
+  - paragraph [ref=e5]: 小时智脑
+  - generic [ref=e6]:
+    - heading "登录" [level=2] [ref=e7]
+    - textbox "请输入主密码" [ref=e8]
+    - button "进入" [ref=e9] [cursor=pointer]

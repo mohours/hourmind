@@ -1,0 +1,10 @@
+- generic [ref=e41]:
+  - generic [ref=e42]:
+    - heading "待办事项" [level=2] [ref=e43]
+    - button "添加任务" [ref=e44] [cursor=pointer]
+  - generic [ref=e45]:
+    - button "全部" [ref=e46] [cursor=pointer]
+    - button "待办" [ref=e47] [cursor=pointer]
+    - button "进行中" [ref=e48] [cursor=pointer]
+    - button "已完成" [ref=e49] [cursor=pointer]
+  - generic [ref=e50]: 暂无任务，点击上方按钮添加

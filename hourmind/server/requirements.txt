@@ -1,0 +1,10 @@
+# server/requirements.txt
+# HourMind 后端依赖 —— FastAPI + WebSocket + 加密 + HTTP 客户端
+fastapi
+uvicorn[standard]
+websockets
+python-jose[cryptography]
+bcrypt
+cryptography
+httpx
+python-dotenv

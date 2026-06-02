@@ -1,0 +1,63 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e4] [cursor=pointer]:
+      - generic [ref=e5]: ⚡
+      - generic [ref=e6]: HourMind
+    - generic [ref=e7]:
+      - link "📊 仪表盘" [ref=e8] [cursor=pointer]:
+        - /url: "#/"
+        - generic [ref=e9]: 📊
+        - generic [ref=e10]: 仪表盘
+      - link "💬 对话" [ref=e11] [cursor=pointer]:
+        - /url: "#/chat"
+        - generic [ref=e12]: 💬
+        - generic [ref=e13]: 对话
+      - link "🔑 API Keys" [ref=e14] [cursor=pointer]:
+        - /url: "#/keys"
+        - generic [ref=e15]: 🔑
+        - generic [ref=e16]: API Keys
+      - link "✅ 待办" [ref=e17] [cursor=pointer]:
+        - /url: "#/tasks"
+        - generic [ref=e18]: ✅
+        - generic [ref=e19]: 待办
+      - link "📚 知识库" [ref=e20] [cursor=pointer]:
+        - /url: "#/knowledge"
+        - generic [ref=e21]: 📚
+        - generic [ref=e22]: 知识库
+      - link "📋 历史" [ref=e23] [cursor=pointer]:
+        - /url: "#/history"
+        - generic [ref=e24]: 📋
+        - generic [ref=e25]: 历史
+      - link "⚙️ 设置" [ref=e26] [cursor=pointer]:
+        - /url: "#/settings"
+        - generic [ref=e27]: ⚙️
+        - generic [ref=e28]: 设置
+    - button "退出登录" [ref=e30] [cursor=pointer]
+  - main [ref=e31]:
+    - generic [ref=e56]:
+      - complementary [ref=e57]:
+        - button "+ 新建对话" [ref=e58] [cursor=pointer]
+        - generic [ref=e59]:
+          - generic [ref=e60] [cursor=pointer]:
+            - generic [ref=e61]:
+              - generic [ref=e62]: 你好
+              - generic [ref=e63]:
+                - generic [ref=e64]: default
+                - generic [ref=e65]: 0 条消息
+                - generic [ref=e66]: 刚刚
+            - button "x" [ref=e67]
+          - generic [ref=e68] [cursor=pointer]:
+            - generic [ref=e69]:
+              - generic [ref=e70]: 你好
+              - generic [ref=e71]:
+                - generic [ref=e72]: default
+                - generic [ref=e73]: 0 条消息
+                - generic [ref=e74]: 7 分钟前
+            - button "x" [ref=e75]
+      - main [ref=e76]:
+        - generic [ref=e78]:
+          - generic [ref=e79]: HourMind 对话
+          - generic [ref=e80]: 选择左侧对话开始，或点击「新建对话」
+        - generic [ref=e81]:
+          - textbox "输入消息，Enter 发送，Shift+Enter 换行..." [ref=e83]
+          - button "发送" [disabled] [ref=e85]
