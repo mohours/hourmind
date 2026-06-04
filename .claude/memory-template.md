@@ -1,6 +1,6 @@
-# 记忆系统迁移模板
+# 记忆系统迁移模板（基础版，仅 CLAUDE.md + memory/）
 
-将此文件复制到新项目根目录，然后对 Claude 说：**"按照 memory-rules-template.md 设置记忆系统"**。
+将此文件复制到新项目根目录，然后对 Claude 说：**"按照 memory-template.md 设置记忆系统"**。
 
 ## 你需要执行的操作
 
