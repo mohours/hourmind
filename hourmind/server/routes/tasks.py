@@ -1,5 +1,7 @@
 # server/routes/tasks.py
-# 任务管理 REST 端点 —— 任务的增删改查 + 子任务管理
+# 任务管理 REST 端点 —— 任务的增删改查 + 子任务管理 + 智能解析
+import json  # JSON 解析
+import re  # 正则提取
 import uuid  # UUID 生成
 from datetime import datetime, timezone  # UTC 时间
 
@@ -246,3 +248,96 @@ def delete_subtask(
         return {"ok": True}
     finally:
         db.close()  # 确保关闭数据库连接
+
+
+# ── 智能解析 ──
+
+@router.post("/parse")
+def parse_task_text(body: dict, _token: str = Depends(require_auth)):
+    """
+    智能解析粘贴的文本 → AI 提取标题/优先级/日期
+    输入: { "text": "粘贴的原始文本" }
+    输出: { "title": "...", "priority": "...", "due_date": "..." }
+    """
+    import httpx  # HTTP 客户端（延迟导入，避免全局依赖）
+    from services.crypto_service import decrypt  # API Key 解密
+
+    raw_text = body.get("text", "").strip()  # 获取粘贴文本
+    if not raw_text:
+        raise HTTPException(status_code=400, detail="文本不能为空")
+
+    db = get_db()  # 获取数据库连接
+    try:
+        # ── 查活跃 API Key ──
+        key_row = db.execute("""
+            SELECT ak.encrypted_key, p.base_url
+            FROM api_key ak
+            INNER JOIN provider p ON p.id = ak.provider_id
+            WHERE ak.status = 'active'
+            ORDER BY ak.updated_at DESC
+            LIMIT 1
+        """).fetchone()
+
+        if not key_row:
+            raise HTTPException(status_code=400, detail="请先在 Key 管理中添加并激活一个 API Key")
+
+        # ── 解密 Key ──
+        try:
+            plain_key = decrypt(key_row["encrypted_key"])
+        except Exception:
+            raise HTTPException(status_code=500, detail="API Key 解密失败")
+
+        base_url = key_row["base_url"].rstrip("/")
+
+        # ── 构造 AI 请求 ──
+        system_prompt = (
+            "你是一个任务解析助手。分析用户输入的文本，提取任务的标题、优先级和截止日期。"
+            "只返回 JSON，不要其他内容。格式："
+            '{"title":"任务标题","priority":"low/medium/high/urgent","due_date":"ISO日期或null"}'
+            "优先级判断：含\"紧急/立即/截止/马上\"→urgent，含\"会议/周会/汇报/重要/必须\"→high，普通→medium，无明确时限→low"
+            "日期提取：识别文本中的日期时间，转为 ISO 格式(如2026-05-29T08:45)，无法识别则填 null"
+        )
+
+        payload = {
+            "model": "deepseek-chat",  # DeepSeek 解析（便宜且中文好）
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": raw_text},
+            ],
+            "temperature": 0.1,  # 低温度，确保输出稳定
+        }
+
+        # ── 调用 AI ──
+        try:
+            resp = httpx.post(
+                f"{base_url}/chat/completions",
+                json=payload,
+                headers={
+                    "Authorization": f"Bearer {plain_key}",
+                    "Content-Type": "application/json",
+                },
+                timeout=30.0,
+            )
+            if resp.status_code != 200:
+                raise HTTPException(status_code=502, detail=f"AI 服务返回错误: HTTP {resp.status_code}")
+
+            data = resp.json()
+            content = data["choices"][0]["message"]["content"].strip()
+
+            # ── 正则提取 JSON ──
+            match = re.search(r'\{[^}]+\}', content)
+            if not match:
+                raise HTTPException(status_code=500, detail=f"AI 返回格式异常: {content[:200]}")
+
+            parsed = json.loads(match.group())
+            return {
+                "title": parsed.get("title", ""),
+                "priority": parsed.get("priority", "medium"),
+                "due_date": parsed.get("due_date"),
+            }
+        except HTTPException:
+            raise  # 原样抛出 FastAPI 异常
+        except Exception as e:
+            raise HTTPException(status_code=502, detail=f"AI 调用失败: {str(e)}")
+    finally:
+        db.close()

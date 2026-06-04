@@ -29,10 +29,17 @@ export const useAppStore = defineStore('app', () => {
       isAuthenticated.value = data.valid
       isSetupRequired.value = data.setup_required
     } catch {
-      // Token 无效，清除并重新检查
+      // Token 无效，清除并重新检查 setup 状态
       isAuthenticated.value = false
       token.value = ''
       localStorage.removeItem('hourmind_token')
+      try {
+        const res = await fetch('/api/auth/status')
+        const data = await res.json()
+        isSetupRequired.value = !!data.setup_required
+      } catch {
+        isSetupRequired.value = false
+      }
     }
   }
 

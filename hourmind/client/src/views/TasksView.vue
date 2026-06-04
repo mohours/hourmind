@@ -32,7 +32,14 @@
     </div>
 
     <!-- 任务卡片列表 -->
-    <div v-for="task in filteredTasks" :key="task.id" class="glass-card" style="padding: 20px; margin-bottom: 12px;">
+    <div v-for="task in filteredTasks" :key="task.id"
+         class="glass-card task-card"
+         :class="{
+           'task-card--overdue': isOverdue(task),
+           'task-card--in-progress': task.status === 'in_progress' && !isOverdue(task),
+           'task-card--done': task.status === 'done',
+         }"
+         style="padding: 20px; margin-bottom: 12px;">
       <!-- 任务主体行 -->
       <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" @click="toggleExpand(task.id)">
         <!-- 左侧：标题 + 标签 -->
@@ -142,6 +149,19 @@
       <div class="glass-card" style="width: 500px; padding: 32px;">
         <h3 style="margin-bottom: 20px;">{{ editingTask ? '编辑任务' : '添加任务' }}</h3>
 
+        <!-- 粘贴解析区 -->
+        <textarea v-model="parseText" class="auth-input"
+                  placeholder="粘贴文本，自动识别标题、优先级、日期..."
+                  style="min-height: 80px; resize: vertical; font-family: inherit;" />
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <button class="btn-primary" style="padding: 8px 16px; font-size: 13px;"
+                  :disabled="parseLoading || !parseText.trim()"
+                  @click="handleParse">
+            {{ parseLoading ? '解析中...' : '智能解析 ✨' }}
+          </button>
+          <span v-if="parseError" class="error-text">{{ parseError }}</span>
+        </div>
+
         <!-- 任务标题 -->
         <input v-model="form.title" class="auth-input" placeholder="任务标题" />
         <!-- 任务描述 -->
@@ -154,7 +174,7 @@
           <option value="high">高优先级</option>
         </select>
         <!-- 截止日期 -->
-        <input v-model="form.due_date" type="date" class="auth-input" />
+        <input v-model="form.due_date" type="datetime-local" class="auth-input" style="font-size: 16px; padding: 14px 16px; min-height: 48px;" />
 
         <!-- 错误提示 -->
         <p v-if="formError" class="error-text">{{ formError }}</p>
@@ -178,10 +198,12 @@ import { useTaskStore, type Task } from '@/stores/taskStore'
 
 const taskStore = useTaskStore()
 
+// 到期提醒
+
 // 筛选相关
 const filterTabs = [
   { label: '全部', value: 'all' },           // 显示全部任务
-  { label: '待办', value: 'pending' },        // 只显示待办任务
+  { label: '待办', value: 'todo' },          // 只显示待办任务
   { label: '进行中', value: 'in_progress' },  // 只显示进行中任务
   { label: '已完成', value: 'done' },          // 只显示已完成任务
 ]
@@ -205,6 +227,11 @@ const form = reactive({
   due_date: '',     // 截止日期
 })
 
+// 粘贴解析状态
+const parseText = ref('')          // 粘贴的原始文本
+const parseLoading = ref(false)   // 解析加载中
+const parseError = ref('')        // 解析错误提示
+
 // 组件挂载时加载任务列表
 onMounted(async () => {
   await taskStore.fetchTasks()
@@ -222,16 +249,26 @@ function toggleExpand(taskId: string) {
 }
 
 /** 切换任务完成状态 */
+
+/** 判断任务是否已逾期 —— 截止日期已过且未完成 */
+
+/** 检查即将到期的任务并弹通知 —— 提前 2 分钟提醒 */
+function isOverdue(task: Task): boolean {
+  if (!task.due_date || task.status !== 'todo') return false  // 只有待办状态才判断逾期
+  const now = new Date()  // 当前时间
+  const due = new Date(task.due_date)  // 截止时间
+  return due < now  // 截止时间已过
+}
 async function toggleStatus(task: Task) {
-  const newStatus = task.status === 'done' ? 'pending' : 'done'
+  const newStatus = task.status === 'done' ? 'todo' : 'done'
   await taskStore.updateTask(task.id, { status: newStatus })
 }
 
 /** 推进任务状态到下一步 */
 function advanceStatus(task: Task) {
-  // 状态流转：pending → in_progress → done
+  // 状态流转：todo → in_progress → done
   const nextMap: Record<string, string> = {
-    pending: 'in_progress',
+    todo: 'in_progress',
     in_progress: 'done',
   }
   const next = nextMap[task.status]
@@ -240,14 +277,14 @@ function advanceStatus(task: Task) {
 
 /** 获取推进按钮的文本 */
 function nextStatusLabel(status: string): string {
-  if (status === 'pending') return '开始'       // 待办 → 开始进行
-  if (status === 'in_progress') return '完成'   // 进行中 → 标记完成
+  if (status === 'todo') return '标记进行中'          // 待办 → 开始进行
+  if (status === 'in_progress') return '标记完成'   // 进行中 → 标记完成
   return ''
 }
 
 /** 获取推进按钮的样式 */
 function nextStatusBtnStyle(status: string): Record<string, string> {
-  if (status === 'pending') return {
+  if (status === 'todo') return {
     border: '1px solid var(--accent)', color: 'var(--accent)', background: 'transparent',
     borderRadius: '8px', padding: '6px 12px', fontSize: '13px', cursor: 'pointer',
   }
@@ -305,6 +342,38 @@ function openEditDialog(task: Task) {
 }
 
 /** 关闭弹窗 */
+
+/** 智能解析 —— 调用 AI 解析粘贴文本，自动填充表单 */
+async function handleParse() {
+  parseError.value = ""  // 清空错误
+  if (!parseText.value.trim()) return  // 空文本不处理
+
+  parseLoading.value = true  // 开始加载
+  try {
+    const token = localStorage.getItem("hourmind_token") || ""  // 获取 JWT
+    const res = await fetch("/api/tasks/parse", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({ text: parseText.value }),
+    })
+    const data = await res.json()  // 解析响应
+
+    if (data.detail) {
+      parseError.value = data.detail  // 显示后端错误
+    } else {
+      // 成功 —— 自动填充表单字段
+      form.title = data.title || ""  // 填充标题
+      form.priority = data.priority || "medium"  // 填充优先级
+      if (data.due_date) form.due_date = data.due_date.slice(0, 16)  // 填充日期（取 YYYY-MM-DD）
+      form.description = parseText.value  // 原文作为描述
+      parseText.value = ""  // 清空粘贴区
+    }
+  } catch {
+    parseError.value = "网络错误，请检查后端是否启动"
+  } finally {
+    parseLoading.value = false  // 结束加载
+  }
+}
 function closeDialog() {
   showDialog.value = false        // 隐藏弹窗
   editingTask.value = null        // 清空编辑目标
@@ -409,3 +478,45 @@ function subtaskProgress(task: Task): string {
   return `${done}/${task.subtasks.length} 子任务`
 }
 </script>
+
+<style scoped>
+/* ── 任务卡片颜色变体 ── */
+
+/* 逾期 —— 京东红流光边框 */
+.task-card--overdue::before {
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    #E2231A, #C41230, #FF4D4F, #E2231A, #B01020
+  ) !important; /* 京东红系锥形渐变 */
+}
+
+.task-card--overdue:hover {
+  box-shadow: 0 8px 36px rgba(226, 35, 26, 0.25), 0 0 0 1px rgba(226, 35, 26, 0.1) inset !important; /* 红色辉光 */
+}
+
+/* 进行中 —— 淘宝橙流光边框 */
+.task-card--in-progress::before {
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    #FF6A00, #FF9000, #FFB347, #FF6A00, #E85D00
+  ) !important; /* 淘宝橙系锥形渐变 */
+}
+
+.task-card--in-progress:hover {
+  box-shadow: 0 8px 36px rgba(255, 106, 0, 0.25), 0 0 0 1px rgba(255, 106, 0, 0.1) inset !important; /* 橙色辉光 */
+}
+
+/* 已完成 —— 淡绿色微光，静态 */
+.task-card--done {
+  opacity: 0.6; /* 半透明淡化 */
+}
+.task-card--done::before {
+  animation: none !important; /* 停止旋转 */
+  background: conic-gradient(
+    from 0deg,
+    rgba(52, 211, 153, 0.15), rgba(52, 211, 153, 0.05)
+  ) !important; /* 微弱绿边 */
+}
+
+
+</style>
