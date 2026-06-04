@@ -1,0 +1,24 @@
+{
+  "tasks": [
+    {
+      "id": "dcfde3ba",
+      "cron": "0 12 * * *",
+      "prompt": "本次会话的对话日志还没整理，请按交错格式整理本次会话的对话日志到 memory/conversations/YYYY-MM/YYYY-MM-DD.md，更新关键决策、偏好到 memory/ 对应文件。如果目前没有需要整理的内容则跳过。",
+      "createdAt": 1780536962437,
+      "recurring": true,
+      "createdBySessionId": "7d00e3d3-4809-4b18-b85f-607fef18f60d",
+      "createdByPid": 69611,
+      "createdByProcStart": "Thu Jun  4 01:32:25 2026"
+    },
+    {
+      "id": "e792e079",
+      "cron": "0 18 * * *",
+      "prompt": "本次会话的对话日志还没整理，请按交错格式整理本次会话的对话日志到 memory/conversations/YYYY-MM/YYYY-MM-DD.md，更新关键决策、偏好到 memory/ 对应文件。如果目前没有需要整理的内容则跳过。",
+      "createdAt": 1780536969668,
+      "recurring": true,
+      "createdBySessionId": "7d00e3d3-4809-4b18-b85f-607fef18f60d",
+      "createdByPid": 69611,
+      "createdByProcStart": "Thu Jun  4 01:32:25 2026"
+    }
+  ]
+}
