@@ -40,3 +40,4 @@ npm-debug.log*
 
 # --- 用户上传的文件目录 ---
 data/
+.playwright-mcp
