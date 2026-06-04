@@ -11,6 +11,7 @@
 - 不修改 .env / credentials 需确认
 - 不在循环中操作数据库
 - 禁止主动操作数据库
+- 未明确指令禁止 git add / git commit / git push
 
 ## 报错处理
 - 先诊断根因，再修复

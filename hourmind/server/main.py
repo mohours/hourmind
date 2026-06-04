@@ -46,6 +46,10 @@ app.include_router(tasks_router)
 from routes.knowledge import router as knowledge_router
 app.include_router(knowledge_router)
 
+# 注册系统设置路由
+from routes.settings import router as settings_router
+app.include_router(settings_router)
+
 # 注册对话会话管理路由
 from routes.conversations import router as conv_router
 app.include_router(conv_router)

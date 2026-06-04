@@ -92,7 +92,7 @@ async def stream_chat(conversation_id, model, content, cancel_flag=None):
                     # ── 检查取消标志 ──
                     if cancel_flag and cancel_flag.get("cancelled"):  # 用户取消
                         # 保存已收到的部分回复
-                        _save_response(db, conversation_id, messages, full_response)
+                        _save_response(db, conversation_id, messages, full_response, token_count)
                         yield {"type": "error", "message": "用户取消"}
                         return
 
@@ -123,7 +123,7 @@ async def stream_chat(conversation_id, model, content, cancel_flag=None):
                         token_count = usage.get("total_tokens", 0)  # 提取总 token 数
 
         # ── 6. 保存助手回复到数据库 ──
-        _save_response(db, conversation_id, messages, full_response)
+        _save_response(db, conversation_id, messages, full_response, token_count)
 
         # ── 7. 返回结束事件 ──
         yield {
@@ -142,7 +142,7 @@ async def stream_chat(conversation_id, model, content, cancel_flag=None):
         db.close()  # 确保关闭数据库连接
 
 
-def _save_response(db, conversation_id, messages, full_response):
+def _save_response(db, conversation_id, messages, full_response, token_count=0):
     """
     内部函数 —— 将用户消息和助手回复写入数据库
     参数:
@@ -150,6 +150,7 @@ def _save_response(db, conversation_id, messages, full_response):
         conversation_id: 会话 ID
         messages: 当前消息列表（已包含用户消息，不含助手回复）
         full_response: 助手完整回复文本
+        token_count: Token 消耗数
     """
     if not full_response:  # 没有回复内容则不保存
         return
@@ -164,7 +165,7 @@ def _save_response(db, conversation_id, messages, full_response):
         WHERE id = ?
     """, (
         json.dumps(messages, ensure_ascii=False),  # 序列化完整消息列表
-        0,  # token_count，此处不精确统计，由 end 事件告知前端
+        token_count,  # Token 消耗数
         conversation_id,
     ))
     db.commit()  # 提交事务

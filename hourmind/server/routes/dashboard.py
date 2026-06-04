@@ -18,14 +18,14 @@ def get_dashboard(_token: str = Depends(require_auth)):
             "SELECT COUNT(*) AS count FROM api_key WHERE status = 'active'"
         ).fetchone()["count"]
 
-        # ── 统计今日 Token 用量（汇总所有 Key 的 today_tokens）──
-        keys_rows = db.execute(
-            "SELECT usage FROM api_key WHERE status != 'deleted'"
-        ).fetchall()
-        today_tokens = 0  # 今日 Token 总数
-        for row in keys_rows:
-            usage_json = json.loads(row["usage"] or "{}")  # 解析 usage JSON
-            today_tokens += usage_json.get("today_tokens", 0)  # 累加 today_tokens
+        # ── 统计今日 Token 用量（从对话表汇总今天更新的对话）──
+        today_row = db.execute("""
+            SELECT COALESCE(SUM(total_tokens), 0) AS total
+            FROM conversation
+            WHERE date(updated_at) = date('now')
+            AND status = 'active'
+        """).fetchone()
+        today_tokens = today_row["total"] if today_row else 0  # 今日 Token 总数
 
         # ── 统计会话总数 ──
         conversation_count = db.execute(

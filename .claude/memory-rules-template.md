@@ -37,7 +37,7 @@ mkdir -p .claude/memory/conversations/
 
 - 路径：`memory/conversations/YYYY-MM/YYYY-MM-DD.md`（按月归类）
 - 按天一个文件，同一天多次会话用 `### 第 N 次会话 (HH:MM-HH:MM)` 分隔追加
-- 交错格式：用户消息原文 → Claude 回复精简为一行摘要，保持问答对应关系
+- 交错格式：用户消息原文 → Claude 回复 ≤100 字原文照录，>100 字压缩为 ≤100 字摘要，保持问答对应关系
 - MEMORY.md 只保留一个指向 `memory/conversations/` 的固定入口，不逐条索引
 ```
 
@@ -128,7 +128,7 @@ updated_at: <当前时间 YYYY-MM-DD HH:MM>
 ## 设计说明（给用户看，不用执行）
 
 这套记忆系统的核心思路：
-- **对话日志**：按天存储，用户原文 + Claude 摘要交错排列，方便回溯
+- **对话日志**：按天存储，用户全文 + Claude 回复（≤100 字照录，>100 字压缩摘要）交错排列
 - **自动补录**：即使忘记说"下班了"，下次启动也会自动从 transcript 补录
 - **索引精简**：MEMORY.md 不逐条列日志，避免随时间膨胀
 - **不依赖 hook**：纯 Claude Code 内置能力，无需外部插件或 MCP

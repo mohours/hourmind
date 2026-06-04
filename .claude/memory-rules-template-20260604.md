@@ -172,7 +172,7 @@ mkdir -p .claude/memory/conversations/
 
 - 路径：`memory/conversations/YYYY-MM/YYYY-MM-DD.md`（按月归类）
 - 按天一个文件，同一天多次会话用 `### 第 N 次会话 (HH:MM-HH:MM)` 分隔追加
-- 交错格式：用户消息原文 → Claude 回复精简为一行摘要，保持问答对应关系
+- 交错格式：用户消息原文 → Claude 回复 ≤100 字原文照录，>100 字压缩为 ≤100 字摘要，保持问答对应关系
 - MEMORY.md 只保留一个指向 `memory/conversations/` 的固定入口，不逐条索引
 ```
 
