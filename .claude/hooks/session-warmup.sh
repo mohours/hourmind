@@ -48,7 +48,7 @@ content = sys.argv[1]
 output = {
     'hookSpecificOutput': {
         'hookEventName': 'SessionStart',
-        'additionalContext': '=== 上次会话上下文（自动预热）===\n' + content + '\n=== 预热结束 ==='
+        'additionalContext': '=== 上次会话上下文（自动预热）===\n' + content + '\n=== 预热结束 ===\n\n本次会话中如发现新的用户偏好、技术决策或项目事实，请在会话结束或用户发出结束信号（下班了/再见/结束）前主动询问是否需要记录到 rules/（用户级）或 memory/（项目级）。'
     }
 }
 print(json.dumps(output, ensure_ascii=False))
