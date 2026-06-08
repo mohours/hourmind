@@ -57,15 +57,22 @@ async def stream_chat(conversation_id, model, content, cancel_flag=None):
 
         messages.append({"role": "user", "content": content})  # 追加用户新消息
 
-        # ── 4. 构造请求体 ──
+        # ── 4. 读取用户温度设置 ──
+        temp_row = db.execute(
+            "SELECT value FROM config WHERE key = 'ai_temperature'"
+        ).fetchone()  # 查 config 表中的温度配置
+        temperature = float(temp_row["value"]) if temp_row else 0.7  # 默认 0.7
+
+        # ── 5. 构造请求体 ──
         url = f"{base_url}/chat/completions"  # OpenAI 兼容端点
         payload = {
             "model": model,  # 模型标识
             "messages": messages,  # 完整消息历史
             "stream": True,  # 开启 SSE 流式返回
+            "temperature": temperature,  # 用户设置的温度参数
         }
 
-        # ── 5. 发起异步 SSE POST 请求 ──
+        # ── 6. 发起异步 SSE POST 请求 ──
         full_response = ""  # 累积完整回复文本
         token_count = 0  # Token 用量计数
 
@@ -122,10 +129,10 @@ async def stream_chat(conversation_id, model, content, cancel_flag=None):
                     if usage:  # 有 usage 数据
                         token_count = usage.get("total_tokens", 0)  # 提取总 token 数
 
-        # ── 6. 保存助手回复到数据库 ──
+        # ── 7. 保存助手回复到数据库 ──
         _save_response(db, conversation_id, messages, full_response, token_count)
 
-        # ── 7. 返回结束事件 ──
+        # ── 8. 返回结束事件 ──
         yield {
             "type": "end",  # 流结束标志
             "token_count": token_count,  # Token 消耗数

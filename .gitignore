@@ -24,6 +24,7 @@ node_modules/
 # --- 编译输出（从 .ts 编译出的 .js，随时可重新编译）---
 dist/
 *.tsbuildinfo
+.vite/
 
 # --- IDE 编辑器配置（每个人编辑器配置不同，不共享）---
 .vscode/
