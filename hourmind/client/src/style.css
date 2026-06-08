@@ -380,6 +380,90 @@ input:-webkit-autofill:focus {
 }
 
 /* ================================================================ */
+/*  OAuth 第三方登录按钮 —— 深色玻璃态 + 图标左对齐                     */
+/* ================================================================ */
+.btn-oauth {
+  width: 100%;
+  padding: 14px 24px;
+  margin-bottom: 16px;
+  background: rgba(36, 38, 45, 0.8);  /* 深灰玻璃底 */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);  /* 玻璃模糊 */
+}
+
+/* OAuth 按钮悬浮辉光 */
+.btn-oauth:hover {
+  background: rgba(46, 48, 55, 0.9);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.08);  /* 白色辉光 */
+  transform: translateY(-1px);  /* 微上浮 */
+}
+
+.btn-oauth:active {
+  transform: scale(0.98);  /* 弹性缩放 */
+}
+
+.btn-oauth:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* OAuth 图标尺寸 */
+.oauth-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;  /* 不缩小 */
+}
+
+/* 分隔线 —— "或" */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);  /* 半透明白线 */
+}
+
+.divider-text {
+  padding: 0 16px;
+}
+
+/* 链接式按钮 —— 展开密码登录 */
+.btn-link {
+  width: 100%;
+  padding: 12px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.2s;
+  text-align: center;  /* 居中 */
+}
+
+.btn-link:hover {
+  color: var(--color-primary);  /* 悬浮变青 */
+}
+
+/* ================================================================ */
 /*  日期选择器 —— Quantum Flow 暗色主题                              */
 /* ================================================================ */
 input[type="date"],

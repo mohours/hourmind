@@ -71,6 +71,19 @@ async function checkReminders() {
 
 // 页面加载时检查 token 有效性
 onMounted(async () => {
+  // 检测 OAuth 回调参数 —— URL 中有 ?token=xxx 则直接保存
+  const hashParts = window.location.hash.slice(1).split('?')  // hash 模式下分离路径和 query
+  if (hashParts.length > 1) {
+    const urlParams = new URLSearchParams(hashParts[1])
+    const oauthToken = urlParams.get('token')
+    if (oauthToken) {
+      store.handleOAuthToken(oauthToken)
+      // 清理 URL 中的 token 参数（不留痕迹），跳转到首页
+      window.location.hash = '#/'
+      return
+    }
+  }
+
   await store.checkAuth()
 
   // 请求通知权限 + 启动提醒（仅已认证时）

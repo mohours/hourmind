@@ -86,3 +86,14 @@ CREATE TABLE IF NOT EXISTS knowledge (
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
 );
+
+-- 第三方登录绑定表（记录已绑定的 OAuth 账号）
+CREATE TABLE IF NOT EXISTS user_auth (
+    id               TEXT PRIMARY KEY,
+    provider         TEXT NOT NULL,          -- 平台标识：github / wechat / google
+    provider_user_id TEXT NOT NULL,          -- 第三方平台用户 ID
+    provider_username TEXT,                  -- 第三方用户名（展示用）
+    access_token     TEXT,                   -- AES-256-GCM 加密存储的 access_token
+    created_at       TEXT DEFAULT (datetime('now')),
+    UNIQUE(provider, provider_user_id)
+);

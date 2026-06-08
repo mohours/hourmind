@@ -15,3 +15,12 @@ DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                              os.getenv("DATABASE_PATH", "data/hourmind.db"))
 # 服务端口
 PORT = int(os.getenv("PORT", "8000"))
+
+# ── OAuth 第三方登录配置 ──
+# GitHub OAuth（localhost 回调）
+GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "")
+GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "")
+GITHUB_REDIRECT_URI = os.getenv("GITHUB_REDIRECT_URI", "http://localhost:8000/api/auth/oauth/github/callback")
+# 微信开放平台（预留，需公网域名 + 备案）
+WECHAT_APP_ID = os.getenv("WECHAT_APP_ID", "")
+WECHAT_APP_SECRET = os.getenv("WECHAT_APP_SECRET", "")

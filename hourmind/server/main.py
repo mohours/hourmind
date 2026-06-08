@@ -58,6 +58,10 @@ app.include_router(conv_router)
 from routes.chat_ws import router as chat_ws_router
 app.include_router(chat_ws_router)
 
+# 注册 OAuth 第三方登录路由
+from routes.oauth import router as oauth_router
+app.include_router(oauth_router)
+
 
 @app.get("/api/health")
 def health():

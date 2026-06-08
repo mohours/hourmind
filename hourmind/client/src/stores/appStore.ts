@@ -75,5 +75,28 @@ export const useAppStore = defineStore('app', () => {
     window.location.reload()
   }
 
-  return { token, isAuthenticated, isSetupRequired, checkAuth, setup, login, logout }
+  /** 获取已启用的 OAuth 提供商列表 */
+  async function getOAuthProviders() {
+    const res = await fetch('/api/auth/oauth/providers')
+    const data = await res.json()
+    return data.providers || []  // [{id, name, icon}, ...]
+  }
+
+  /** 获取 OAuth 授权 URL——前端跳转到第三方授权页 */
+  async function getOAuthLoginUrl(provider: string) {
+    const res = await fetch(`/api/auth/oauth/${provider}/login`)
+    const data = await res.json()
+    return data.authorization_url  // 返回跳转 URL 字符串
+  }
+
+  /** 处理 OAuth 回调 token——从 URL 中提取 token 并保存到 localStorage */
+  function handleOAuthToken(newToken: string) {
+    token.value = newToken
+    localStorage.setItem('hourmind_token', newToken)
+    isAuthenticated.value = true
+    isSetupRequired.value = false
+  }
+
+  return { token, isAuthenticated, isSetupRequired, checkAuth, setup, login, logout,
+           getOAuthProviders, getOAuthLoginUrl, handleOAuthToken }
 })
